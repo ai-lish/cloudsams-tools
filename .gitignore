@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+.env
+.env.local
+
+# Node
+node_modules/
+npm-debug.log
+
+# === 每個 tool 既 input / output 一定 gitignore ===
+# Tools 應該自己定義更仔細嘅 gitignore
+# 呢度係 global fallback
+*/input/
+*/output/
+*/inputs/
+*/outputs/
+*/tmp/
+*/temp/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# OS
+Thumbs.db
