@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cloudsams-tools — CloudSAMS 行政小工具</title>
+<meta name="description" content="香港中學校務系統 CloudSAMS 行政批量化 CLI 工具集。PDF split、班相改名等。">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <p class="site-title">CloudSAMS 行政小工具 <span class="en">cloudsams-tools</span></p>
+    <nav class="site-nav" aria-label="主導覽">
+      <ul>
+        <li><a href="#tools">Tools</a></li>
+        <li><a href="ARCHITECTURE.html">Docs</a></li>
+        <li><a href="https://github.com/ai-lish/cloudsams-tools">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<div class="security-banner" role="note" aria-label="安全提示">
+  <div class="wrap">
+    <span class="icon" aria-hidden="true">⚠️</span>
+    <p>
+      呢個係 <strong>公開 repository</strong>。請勿 commit 真實學生資料、學校內部 URL 或
+      CloudSAMS API credentials。詳見 <a href="SECURITY.html">SECURITY.md</a>。
+    </p>
+  </div>
+</div>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap">
+      <h1>A monorepo of small batch CLI tools for CloudSAMS admin tasks in Hong Kong secondary schools.</h1>
+      <p class="tagline">每個工具一個獨立 folder，自己有 README + 依賴 —— 老師/校務人員喺本機行，唔連 CloudSAMS server。</p>
+      <div class="cta-group">
+        <a class="btn btn-primary" href="#quickstart">Get started</a>
+        <a class="btn btn-secondary" href="https://github.com/ai-lish/cloudsams-tools">View on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="tools">
+    <div class="wrap">
+      <h2>工具列表 Tools</h2>
+      <p class="section-intro">每張卡對應 <code>tools/&lt;name&gt;/</code> 一個 folder，狀態徽章直接讀自各自嘅 <code>tool.yaml</code>。</p>
+
+      <div class="tools-grid">
+
+        <article class="tool-card">
+          <div class="tool-card-head">
+            <h3>slp-split-pdf</h3>
+            <span class="badge badge-stable">stable</span>
+          </div>
+          <p>Split CloudSAMS SLP PDF into per-page / per-range files</p>
+          <pre><code>cd tools/slp-split-pdf
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r requirements.txt
+../../cloudsams slp-split-pdf --input slp.pdf --output-dir ./output</code></pre>
+          <p class="tool-card-links"><a href="tools/slp-split-pdf/">Tool README →</a></p>
+        </article>
+
+        <article class="tool-card">
+          <div class="tool-card-head">
+            <h3>class-photo-rename</h3>
+            <span class="badge badge-wip">wip</span>
+          </div>
+          <p>Rename class photos to CloudSAMS &lt;class_code&gt;&lt;regno&gt; convention</p>
+          <pre><code>cd tools/class-photo-rename
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r requirements.txt
+../../cloudsams class-photo-rename --input-dir ./raw-photos \
+  --output-dir ./renamed --mapping ./mapping.csv</code></pre>
+          <p class="tool-card-links"><a href="tools/class-photo-rename/">Tool README →</a> — skeleton demo, 邏輯未實作</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="architecture">
+    <div class="wrap">
+      <div class="arch-callout">
+        <h2>How tools fit together in 10 seconds</h2>
+        <p class="section-intro">
+          Dispatcher（<code>cloudsams_tools/</code>）零第三方依賴，靠 runtime 掃
+          <code>tools/*/tool.yaml</code> 嚟做到 discoverability，冇中央 registry。
+        </p>
+        <ol>
+          <li>每個 tool folder 有一個 <code>tool.yaml</code>（name / summary / status / runtime）— <code>cloudsams list</code> 淨係讀呢個檔，唔 import tool 本身。</li>
+          <li>每個 tool 有一個 <code>main.py</code>，入面實作 <code>run(argv) -&gt; int</code> —— 呢個係唯一嘅執行 contract。</li>
+          <li><code>cloudsams &lt;name&gt; ...</code> 先 lazy import 嗰一個 tool；壞咗一個 tool 唔會拖冧其他 tool 或 <code>list</code>。</li>
+        </ol>
+        <p><a href="ARCHITECTURE.html">睇完整設計理由 → ARCHITECTURE.md</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="quickstart" class="quickstart">
+    <div class="wrap">
+      <h2>Quickstart</h2>
+      <p class="section-intro">用統一 CLI 定係獨立行個 tool 都得，睇你順手。</p>
+      <ol>
+        <li>
+          Clone repo，用統一 CLI 睇齊所有工具（唔使裝任何 dependency）：
+          <pre><code>git clone https://github.com/ai-lish/cloudsams-tools.git
+cd cloudsams-tools
+./cloudsams list</code></pre>
+        </li>
+        <li>
+          裝某個 tool 自己嘅依賴，再經 dispatcher 行：
+          <pre><code>cd tools/slp-split-pdf
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+../../cloudsams slp-split-pdf --help</code></pre>
+        </li>
+        <li>
+          或者完全獨立行，唔經 dispatcher：
+          <pre><code>python split.py --input slp.pdf --output-dir ./output</code></pre>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>&copy; 2026 ai-lish/cloudsams-tools — All Rights Reserved（未指定 license，重用請聯絡作者）</span>
+    <span><a href="https://github.com/ai-lish/cloudsams-tools">GitHub</a></span>
+    <span>Last updated: 2026-07-02</span>
+  </div>
+</footer>
+
+</body>
+</html>
