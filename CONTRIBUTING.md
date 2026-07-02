@@ -2,6 +2,8 @@
 
 每個工具係 `tools/<tool-name>/` 入面一個獨立 folder。
 
+> 詳細 step-by-step recipe（點樣加、點解噉設計）見 [ARCHITECTURE.md §6](./ARCHITECTURE.md#6-加一個新-tool--step-by-step-recipe)。
+
 ## 流程
 
 1. **Spec**：用 `tools/_template/` 嘅 template 開新 folder。將「輸入／輸出／CLI 用法／sample fixture」寫入 `README.md`

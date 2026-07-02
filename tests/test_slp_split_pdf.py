@@ -1,13 +1,25 @@
 """Smoke test for slp-split-pdf: create a synthetic 5-page PDF, split, verify."""
+import importlib.util
 import sys
 import tempfile
 from pathlib import Path
+from types import ModuleType
 
 from pypdf import PdfReader, PdfWriter
 
 # Allow `import split` from sibling folder
-sys.path.insert(0, str(Path(__file__).parent.parent / "tools" / "slp-split-pdf"))
+TOOL_DIR = Path(__file__).parent.parent / "tools" / "slp-split-pdf"
+sys.path.insert(0, str(TOOL_DIR))
 import split  # noqa: E402
+
+
+def _load_dispatcher_main() -> ModuleType:
+    """Import tools/slp-split-pdf/main.py the same way cli.py's dispatcher does."""
+    spec = importlib.util.spec_from_file_location("slp_split_pdf_main", TOOL_DIR / "main.py")
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def make_dummy_pdf(path: Path, n_pages: int = 5) -> None:
@@ -50,6 +62,22 @@ def test_range_split(tmp_path: Path) -> None:
     # total pages across outputs should equal 3 + 1 + 2 = 6
     total = sum(len(PdfReader(str(f)).pages) for f in files)
     assert total == 6
+
+
+def test_dispatcher_entry_run(tmp_path: Path) -> None:
+    """Same code path `cloudsams slp-split-pdf ...` uses: import main.py, call run(argv)."""
+    src = tmp_path / "slp-sample.pdf"
+    out = tmp_path / "out"
+    make_dummy_pdf(src, n_pages=4)
+
+    main_module = _load_dispatcher_main()
+    rc = main_module.run(["--input", str(src), "--output-dir", str(out), "--mode", "per-page"])
+    assert rc == 0
+
+    files = sorted(out.glob("*.pdf"))
+    assert len(files) == 4
+    for f in files:
+        assert f.name.startswith("slp-sample_page-")
 
 
 if __name__ == "__main__":

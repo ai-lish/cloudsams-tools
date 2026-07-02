@@ -21,6 +21,10 @@
 
 睇 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
+## 架構
+
+Monorepo 點樣拆 tool、shared code 邊界、`cloudsams` 統一 CLI 點運作 —— 詳見 [ARCHITECTURE.md](./ARCHITECTURE.md)。
+
 ## License
 
 未指定。預設 All Rights Reserved。如要重用請聯絡作者。

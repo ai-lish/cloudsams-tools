@@ -1,0 +1,7 @@
+# tools/_template/tool.yaml — cp 呢個 folder 開新 tool 之後，改晒下面啲位。
+name: your-tool-name-placeholder   # 要同 folder 名一致，kebab-case
+summary: One-line 講呢個 tool 做乜
+status: wip                        # stable | beta | wip
+runtime: python                    # python | node
+entry: main.py
+requires_python: ">=3.10"

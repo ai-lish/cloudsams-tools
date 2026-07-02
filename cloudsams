@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+"""
+cloudsams — thin root launcher（ARCHITECTURE.md §4.1）。
+
+零安裝：唔使 `pip install`，直接 exec 呢個檔（`./cloudsams list`）或
+`python3 cloudsams list`。將 repo root 加入 sys.path 就搵到 cloudsams_tools package。
+"""
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from cloudsams_tools.cli import main  # noqa: E402
+
+if __name__ == "__main__":
+    sys.exit(main())
